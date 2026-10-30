@@ -30,7 +30,7 @@ template <class T> void _print(unordered_multiset<T> v) { cerr << "[ "; for (T i
 template <class T, class V> void _print(unordered_map<T, V> v) { cerr << "[ "; for (auto i : v) { _print(i); cerr << " "; } cerr << "]"; }
 
 
-vector<vector<int>> board(8,vector<int>(8));
+vector<vector<string>> board(8,vector<string>(8));
 
 
 class chess{
@@ -48,8 +48,6 @@ private:
     }
     return "null"; // Not found
 }
-
-
 
 public:
   void play(){
@@ -95,44 +93,8 @@ public:
       {"P8","H2"}
     };
 
-
-
-
-
-
-
-
-
-
-
     vector<pair<string,string>>move_history;
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-    int cnt  = 5;
+    int cnt  = 10;
     bool white_turn = true;
     while(cnt--){
 
@@ -172,6 +134,10 @@ public:
       cout << ".....Before....." << endl;
       if(white_turn) {
         debug(white_piece);
+        string loc = findKey(black_piece,choose_location);
+        if(loc != "null"){
+
+        }
       }
       else {
         debug(black_piece);
@@ -192,6 +158,7 @@ public:
         debug(black_piece);
       }
       move_history.push_back({choose_piece,choose_location});
+      debug(move_history);
 
       white_turn = !white_turn;
       debug(move_history);
