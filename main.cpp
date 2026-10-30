@@ -49,6 +49,26 @@ private:
     return "null"; // Not found
 }
 
+private:
+void print_board(){
+        for(int i = 7; i >= 0; i--){
+          for(int j = 7; j >= 0; j--){
+            string piece = findKey(
+                white_piece,
+                string(1, (char)('H' - j)) + to_string(i + 1)); 
+              
+              if(piece == "null")
+                piece = findKey( black_piece, string(1, (char)('H' - j)) + to_string(i + 1));
+                  
+              if(piece == "null")
+                    piece = ",";
+                      
+                      cout << setw(4) << piece;
+          }
+          cout << endl;
+        }
+}
+
 public:
   void play(){
     black_piece = {
@@ -97,69 +117,44 @@ public:
     int cnt  = 10;
     bool white_turn = true;
     while(cnt--){
+      
+      print_board();
 
       cout << (white_turn == true ? "white turn!!\n": "black turn!!\n");
-      
-        for(int i = 7; i >= 0; i--){
-          for(int j = 7; j >= 0; j--){
-            string piece = findKey(
-                white_piece,
-                string(1, (char)('H' - j)) + to_string(i + 1)
-                );
-              
-              if(piece == "null")
-                piece = findKey(
-                    black_piece,
-                    string(1, (char)('H' - j)) + to_string(i + 1)
-                    );
-                  
-                  if(piece == "null")
-                    piece = ",";
-                      
-                      cout << setw(4) << piece;
-          }
-          cout << endl;
-        }
 
-
-
+      string choose_piece;
       cout << "Choose Piece? " << endl;
-      string choose_piece; cin >> choose_piece; // P1
+      cin >> choose_piece; // P1
+
       cout << "You have choose Piece-> " << choose_piece << endl;
 
+      string choose_location;
       cout << "Choose Location? " << endl;
-      string choose_location; cin >> choose_location; // A4
+      cin >> choose_location; // A4
+
       cout << "You have choose Location-> " << choose_location << endl;
 
-      cout << ".....Before....." << endl;
+      // capture rule
       if(white_turn) {
-        debug(white_piece);
         string loc = findKey(black_piece,choose_location);
-        if(loc != "null"){
-
-        }
+        if(loc != "null") black_piece[loc] = "X";
       }
       else {
-        debug(black_piece);
+        string loc = findKey(white_piece,choose_location);
+        if(loc != "null") white_piece[loc] = "X";
       }
 
 
 
-      // rule based insertation
+      // after move setting new location
       if (white_turn) white_piece[choose_piece] = choose_location;
       else black_piece[choose_piece] = choose_location;
 
-      cout << ".....After....." << endl;
-
-      if(white_turn) {
-        debug(white_piece);
-      }
-      else {
-        debug(black_piece);
-      }
+      // storing all moves in location
       move_history.push_back({choose_piece,choose_location});
       debug(move_history);
 
+      // turun alternating
       white_turn = !white_turn;
       debug(move_history);
     }
