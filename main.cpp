@@ -39,8 +39,19 @@ public:
   map<string,string>black_piece;
   map<string,string>white_piece;
 
+private:
+  string findKey(map<string, string>& mp, string target) {
+    for (auto &[key, value] : mp) {
+        if (value == target) {
+            return key;
+        }
+    }
+    return "null"; // Not found
+}
 
 
+
+public:
   void play(){
     black_piece = {
       {"R1","H8"},
@@ -64,14 +75,16 @@ public:
 
 
     white_piece = {
-      {"R1","H8"},
-      {"N1","G8"},
-      {"B1","F8"},
-      {"Q","E8"},
-      {"K","D8"},
-      {"B2","C8"},
-      {"N2","B8"},
-      {"R2","A8"},
+      {"R1","A1"},
+      {"R2","H1"},
+      {"N1","B1"},
+      {"N2","G1"},
+      {"B1","F1"},
+      {"Q","E1"},
+      {"K","D1"},
+      {"B2","C1"},
+      {"N2","B1"},
+      {"R2","A1"},
       {"P1","A2"}, // change A2-> A4
       {"P2","B2"},
       {"P3","C2"},
@@ -83,7 +96,35 @@ public:
     };
 
 
+
+
+
+
+
+
+
+
+
     vector<pair<string,string>>move_history;
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
 
 
 
@@ -96,6 +137,30 @@ public:
     while(cnt--){
 
       cout << (white_turn == true ? "white turn!!\n": "black turn!!\n");
+      
+        for(int i = 7; i >= 0; i--){
+          for(int j = 7; j >= 0; j--){
+            string piece = findKey(
+                white_piece,
+                string(1, (char)('H' - j)) + to_string(i + 1)
+                );
+              
+              if(piece == "null")
+                piece = findKey(
+                    black_piece,
+                    string(1, (char)('H' - j)) + to_string(i + 1)
+                    );
+                  
+                  if(piece == "null")
+                    piece = ",";
+                      
+                      cout << setw(4) << piece;
+          }
+          cout << endl;
+        }
+
+
+
       cout << "Choose Piece? " << endl;
       string choose_piece; cin >> choose_piece; // P1
       cout << "You have choose Piece-> " << choose_piece << endl;
