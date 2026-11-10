@@ -68,97 +68,168 @@ void print_board(){
           cout << endl;
         }
 }
+private:
+vector<string> knight_valid_move(string &curr_loc){
+  // first move 
+  char col  =  curr_loc[0];
+  int row = curr_loc[1]-'0'; // converting to integer
+  vector<string> ans;
+
+
+  // left up diagonal move
+  int rank = int(row) + 3;
+  char files = col - 1;
+  ans.push_back(files + to_string(rank));
+
+
+
+  // right up diagonal move
+  rank = int(row) + 3;
+  files = col + 1;
+  ans.push_back(files + to_string(rank));
+
+
+  // left down diagonal move
+   rank = int(row) - 3;
+   files = col - 1;
+  ans.push_back(files + to_string(rank));
+
+
+
+  // right down diagonal move
+  rank = int(row) - 3;
+  files = col + 1;
+  ans.push_back(files + to_string(rank));
+
+
+
+  
+
+
+  // left long up diagonal move
+  rank = int(row) + 1;
+  files = col - 3;
+  ans.push_back(files + to_string(rank));
+
+  // right long up diagonal move
+  rank = int(row) + 1;
+  files = col + 3;
+  ans.push_back(files + to_string(rank));
+
+
+
+  // left long down diagonal move
+  rank = int(row) - 1;
+  files = col - 3;
+  ans.push_back(files + to_string(rank));
+
+
+
+  // right long down diagonal move
+  rank = int(row) - 1;
+  files = col + 3;
+  ans.push_back(files + to_string(rank));
+
+
+  return ans;
+}
 
 public:
-  void play(){
-    black_piece = {
-      {"R1","H8"},
-      {"N1","G8"},
-      {"B1","F8"},
-      {"K","E8"},
-      {"Q","D8"},
-      {"B2","C8"},
-      {"N2","B8"},
-      {"R2","A8"},
-      {"P1","H7"},
-      {"P2","G7"},
-      {"P3","F7"},
-      {"P4","E7"},
-      {"P5","D7"},
-      {"P6","C7"},
-      {"P7","B7"},
-      {"P8","A7"}
-    };
+void play(){
+  black_piece = {
+    {"R1","H8"},
+    {"N1","G8"},
+    {"B1","F8"},
+    {"K","E8"},
+    {"Q","D8"},
+    {"B2","C8"},
+    {"N2","B8"},
+    {"R2","A8"},
+    {"P1","H7"},
+    {"P2","G7"},
+    {"P3","F7"},
+    {"P4","E7"},
+    {"P5","D7"},
+    {"P6","C7"},
+    {"P7","B7"},
+    {"P8","A7"}
+  };
 
 
 
-    white_piece = {
-      {"R1","A1"},
-      {"R2","H1"},
-      {"N1","B1"},
-      {"N2","G1"},
-      {"B1","F1"},
-      {"Q","E1"},
-      {"K","D1"},
-      {"B2","C1"},
-      {"N2","B1"},
-      {"R2","A1"},
-      {"P1","A2"}, // change A2-> A4
-      {"P2","B2"},
-      {"P3","C2"},
-      {"P4","D2"},
-      {"P5","E2"},
-      {"P6","F2"},
-      {"P7","G2"},
-      {"P8","H2"}
-    };
+  white_piece = {
+    {"R1","A1"},
+    {"R2","H1"},
+    {"N1","D4"},
+    {"N2","G1"},
+    {"B1","F1"},
+    {"Q","E1"},
+    {"K","D1"},
+    {"B2","C1"},
+    {"N2","B1"},
+    {"R2","A1"},
+    {"P1","A2"}, // change A2-> A4
+    {"P2","B2"},
+    {"P3","C2"},
+    {"P4","D2"},
+    {"P5","E2"},
+    {"P6","F2"},
+    {"P7","G2"},
+    {"P8","H2"}
+  };
 
-    vector<pair<string,string>>move_history;
-    int cnt  = 10;
-    bool white_turn = true;
-    while(cnt--){
-      
+  vector<pair<string,string>>move_history;
+  int cnt  = 10;
+  bool white_turn = true;
+  while(cnt--){
+    
       print_board();
 
-      cout << (white_turn == true ? "white turn!!\n": "black turn!!\n");
+    cout << (white_turn ? "white turn!!\n": "black turn!!\n");
 
-      string choose_piece;
-      cout << "Choose Piece? " << endl;
-      cin >> choose_piece; // P1
+    string choose_piece;
+    cout << "Choose Piece? " << endl;
+    cin >> choose_piece; // P1
 
-      cout << "You have choose Piece-> " << choose_piece << endl;
+    cout << "You have choose Piece-> " << choose_piece << endl;
 
-      string choose_location;
-      cout << "Choose Location? " << endl;
-      cin >> choose_location; // A4
-
-      cout << "You have choose Location-> " << choose_location << endl;
-
-      // capture rule
-      if(white_turn) {
-        string loc = findKey(black_piece,choose_location);
-        if(loc != "null") black_piece[loc] = "X";
-      }
-      else {
-        string loc = findKey(white_piece,choose_location);
-        if(loc != "null") white_piece[loc] = "X";
-      }
-
-
-
-      // after move setting new location
-      if (white_turn) white_piece[choose_piece] = choose_location;
-      else black_piece[choose_piece] = choose_location;
-
-      // storing all moves in location
-      move_history.push_back({choose_piece,choose_location});
-      debug(move_history);
-
-      // turun alternating
-      white_turn = !white_turn;
-      debug(move_history);
+    if(choose_piece[0] == 'N'){
+      string loc = white_turn ? white_piece[choose_piece] : black_piece[choose_piece];
+      vector<string>ans = knight_valid_move(loc);
+      debug(ans);
     }
+
+    string choose_location;
+    cout << "Choose Location? " << endl;
+    cin >> choose_location; // A4
+
+    cout << "You have choose Location-> " << choose_location << endl;
+
+    // capture rule
+    if(white_turn) {
+      string loc = findKey(black_piece,choose_location);
+      if(loc != "null") black_piece[loc] = "X";
+    }
+    else {
+      string loc = findKey(white_piece,choose_location);
+      if(loc != "null") white_piece[loc] = "X";
+    }
+
+
+
+    // after move setting new location
+    if (white_turn) white_piece[choose_piece] = choose_location;
+    else black_piece[choose_piece] = choose_location;
+
+    // storing all moves in location
+    move_history.push_back({choose_piece,choose_location});
+    debug(move_history);
+
+    // turun alternating
+    white_turn = !white_turn;
+    debug(move_history);
   }
+}
 };
 
 
