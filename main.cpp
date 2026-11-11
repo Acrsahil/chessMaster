@@ -69,37 +69,56 @@ void print_board(){
         }
 }
 private:
-vector<string> knight_valid_move(string &curr_loc){
+bool is_valid_move(int rank,char files){
+  if(rank <1 || rank >8 || files < 'A' || files > 'H') return false;
+  return true;
+}
+private:
+vector<string> knight_valid_move(string &curr_loc,bool white_turn){
   // first move 
+
+
+  // whose game is this
+  map<string,string>search_mp = white_turn ? white_piece : black_piece;
+
   char col  =  curr_loc[0];
   int row = curr_loc[1]-'0'; // converting to integer
   vector<string> ans;
 
 
+
   // left up diagonal move
-  int rank = int(row) + 3;
+  int rank = int(row) + 2;
   char files = col - 1;
+  if(is_valid_move(rank,files) && findKey(search_mp,files+to_string(rank)) == "null") {
   ans.push_back(files + to_string(rank));
+  }
 
 
 
   // right up diagonal move
-  rank = int(row) + 3;
+  rank = int(row) + 2;
   files = col + 1;
+  if(is_valid_move(rank,files) && findKey(search_mp,files+to_string(rank)) == "null") {
   ans.push_back(files + to_string(rank));
+  }
 
 
   // left down diagonal move
-   rank = int(row) - 3;
+   rank = int(row) - 2;
    files = col - 1;
+  if(is_valid_move(rank,files) && findKey(search_mp,files+to_string(rank)) == "null") {
   ans.push_back(files + to_string(rank));
+  }
 
 
 
   // right down diagonal move
-  rank = int(row) - 3;
+  rank = int(row) - 2;
   files = col + 1;
+  if(is_valid_move(rank,files) && findKey(search_mp,files+to_string(rank)) == "null") {
   ans.push_back(files + to_string(rank));
+  }
 
 
 
@@ -108,27 +127,35 @@ vector<string> knight_valid_move(string &curr_loc){
 
   // left long up diagonal move
   rank = int(row) + 1;
-  files = col - 3;
+  files = col - 2;
+  if(is_valid_move(rank,files) && findKey(search_mp,files+to_string(rank)) == "null") {
   ans.push_back(files + to_string(rank));
+  }
 
   // right long up diagonal move
   rank = int(row) + 1;
-  files = col + 3;
+  files = col + 2;
+  if(is_valid_move(rank,files) && findKey(search_mp,files+to_string(rank)) == "null") {
   ans.push_back(files + to_string(rank));
+  }
 
 
 
   // left long down diagonal move
   rank = int(row) - 1;
-  files = col - 3;
+  files = col - 2;
+  if(is_valid_move(rank,files) && findKey(search_mp,files+to_string(rank)) == "null") {
   ans.push_back(files + to_string(rank));
+  }
 
 
 
   // right long down diagonal move
   rank = int(row) - 1;
-  files = col + 3;
+  files = col + 2;
+  if(is_valid_move(rank,files) && findKey(search_mp,files+to_string(rank)) == "null") {
   ans.push_back(files + to_string(rank));
+  }
 
 
   return ans;
@@ -160,7 +187,7 @@ void play(){
   white_piece = {
     {"R1","A1"},
     {"R2","H1"},
-    {"N1","D4"},
+    {"N1","B1"},
     {"N2","G1"},
     {"B1","F1"},
     {"Q","E1"},
@@ -195,7 +222,7 @@ void play(){
 
     if(choose_piece[0] == 'N'){
       string loc = white_turn ? white_piece[choose_piece] : black_piece[choose_piece];
-      vector<string>ans = knight_valid_move(loc);
+      vector<string>ans = knight_valid_move(loc,white_turn);
       debug(ans);
     }
 
@@ -238,6 +265,5 @@ void play(){
 int main() {
   chess c;
   c.play();
-
   return 0;
 }
