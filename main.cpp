@@ -68,10 +68,39 @@ void print_board(){
           cout << endl;
         }
 }
+
+
 private:
 bool is_valid_move(int rank,char files){
   if(rank <1 || rank >8 || files < 'A' || files > 'H') return false;
   return true;
+}
+
+
+private:
+vector<string> rook_valid_move(string &curr_loc, bool white_turn){
+  
+  map<string,string>search_mp = white_turn ? white_piece : black_piece;
+  char col  =  curr_loc[0];
+  int row = curr_loc[1]-'0'; // converting to integer
+
+  int rank = row;
+  char files = col;
+  
+  // up direction 
+
+  while(rank <= 8){
+    if(findKey(search_mp,files + to_string(rank+1)) == "null"){
+      break;
+    }
+    rank++;
+  }
+
+
+
+  vector<string> ans;
+  return {"sahil"};
+
 }
 private:
 vector<string> knight_valid_move(string &curr_loc,bool white_turn){
