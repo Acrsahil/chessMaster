@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+#include <string>
 using namespace std;
 
 #define F(i, n) for (int i = 0; i < n; i++)
@@ -50,23 +51,23 @@ private:
 }
 
 private:
-void print_board(){
-        for(int i = 7; i >= 0; i--){
-          for(int j = 7; j >= 0; j--){
-            string piece = findKey(
-                white_piece,
-                string(1, (char)('H' - j)) + to_string(i + 1)); 
-              
-              if(piece == "null")
-                piece = findKey( black_piece, string(1, (char)('H' - j)) + to_string(i + 1));
-                  
-              if(piece == "null")
-                    piece = ",";
-                      
-                      cout << setw(4) << piece;
-          }
-          cout << endl;
-        }
+void print_board(bool white_turn){
+  for(int i = 7; i >= 0; i--){
+    for(int j = 7; j >= 0; j--){
+      int is_white_piece = 1;
+      string piece = findKey( white_piece, string(1, (char)('H' - j)) + to_string(i + 1)); // first search in white_piece
+      if(piece == "null"){
+        is_white_piece = 0;
+        piece = findKey( black_piece, string(1, (char)('H' - j)) + to_string(i + 1)); // search in black_piece
+      } 
+      if(piece == "null"){
+        is_white_piece = -1;
+        piece = ",";
+      }
+      cout << "| " << emojiOfPiece(piece,is_white_piece) << "  " ;
+    }
+    cout << "|"<< endl;
+  }
 }
 
 
@@ -78,29 +79,115 @@ bool is_valid_move(int rank,char files){
 
 
 private:
+string emojiOfPiece(string piece_notation,int white_turn){
+
+  // Adding White Emoji for game
+  if(white_turn == 1){
+    if(piece_notation[0]=='P') return "♙";
+    else if(piece_notation[0]=='N') return "♘";
+    else if(piece_notation[0]=='B') return "♗";
+    else if(piece_notation[0]=='R') return "♖";
+    else if(piece_notation[0]=='Q') return "♕";
+    else if(piece_notation[0]=='K') return "♔";
+
+
+  }else if(white_turn == 0){
+    // Adding Black Emoji for game
+
+
+    if(piece_notation[0]=='P') return "♟";
+
+
+    else if(piece_notation[0]=='N') return "♞";
+    else if(piece_notation[0]=='B') return "♝";
+    else if(piece_notation[0]=='R') return "♜";
+    else if(piece_notation[0]=='Q') return "♛";
+    else if(piece_notation[0]=='K') return "♚";
+  }
+  return ".";
+}
+
+
+private:
 vector<string> rook_valid_move(string &curr_loc, bool white_turn){
   
-  map<string,string>search_mp = white_turn ? white_piece : black_piece;
-  char col  =  curr_loc[0];
-  int row = curr_loc[1]-'0'; // converting to integer
-
+    vector<string> ans;
+    map<string,string>search_mp = white_turn ? white_piece : black_piece;
+    char col  =  curr_loc[0];
+    int row = curr_loc[1]-'0'; // converting to integer
+  
   int rank = row;
   char files = col;
   
-  // up direction 
+    // up direction 
+    
+    while(rank <= 8){
+      if(rank != row) ans.push_back(files + to_string(rank));
+      if(findKey(search_mp,files + to_string(rank+1)) != "null") break;
 
-  while(rank <= 8){
-    if(findKey(search_mp,files + to_string(rank+1)) == "null"){
-      break;
+        if(white_turn){
+          if(findKey(black_piece,files + to_string(rank)) != "null") break;
+        }else{
+          if(findKey(black_piece,files + to_string(rank)) != "null") break;
+        }
+      rank++;
     }
-    rank++;
-  }
+
+  
+  rank = row;
+  files = col;
+  
+    // down direction 
+    
+    while(rank <= 8){
+      if(rank != row) ans.push_back(files + to_string(rank));
+      if(findKey(search_mp,files + to_string(rank-1)) != "null") break;
+
+        if(white_turn){
+          if(findKey(black_piece,files + to_string(rank)) != "null") break;
+        }else{
+          if(findKey(white_piece,files + to_string(rank)) != "null") break;
+        }
+      rank--;
+    }
+
+  rank = row;
+  files = col;
+  
+    // right direction 
+    
+    while(files <= 'H'){
+      if(files != col) ans.push_back(files + to_string(rank));
+      if(findKey(search_mp,char(files+1) + to_string(rank)) != "null") break;
+
+        if(white_turn){
+          if(findKey(black_piece,files + to_string(rank)) != "null") break;
+        }else{
+          if(findKey(white_piece,files + to_string(rank)) != "null") break;
+        }
+      files++;
+    }
 
 
+  rank = row;
+  files = col;
+  
+    // right direction 
+    
+    while(files >= 'A'){
+      if(files != col) ans.push_back(files + to_string(rank));
+      if(findKey(search_mp,char(files-1) + to_string(rank)) != "null") break;
 
-  vector<string> ans;
-  return {"sahil"};
+        if(white_turn){
+          if(findKey(black_piece,files + to_string(rank)) != "null") break;
+        }else{
+          if(findKey(white_piece,files + to_string(rank)) != "null") break;
+        }
+      files--;
+    }
 
+  return ans;
+    
 }
 private:
 vector<string> knight_valid_move(string &curr_loc,bool white_turn){
@@ -120,7 +207,7 @@ vector<string> knight_valid_move(string &curr_loc,bool white_turn){
   int rank = int(row) + 2;
   char files = col - 1;
   if(is_valid_move(rank,files) && findKey(search_mp,files+to_string(rank)) == "null") {
-  ans.push_back(files + to_string(rank));
+    ans.push_back(files + to_string(rank));
   }
 
 
@@ -129,15 +216,15 @@ vector<string> knight_valid_move(string &curr_loc,bool white_turn){
   rank = int(row) + 2;
   files = col + 1;
   if(is_valid_move(rank,files) && findKey(search_mp,files+to_string(rank)) == "null") {
-  ans.push_back(files + to_string(rank));
+    ans.push_back(files + to_string(rank));
   }
 
 
   // left down diagonal move
-   rank = int(row) - 2;
-   files = col - 1;
+  rank = int(row) - 2;
+  files = col - 1;
   if(is_valid_move(rank,files) && findKey(search_mp,files+to_string(rank)) == "null") {
-  ans.push_back(files + to_string(rank));
+    ans.push_back(files + to_string(rank));
   }
 
 
@@ -146,26 +233,26 @@ vector<string> knight_valid_move(string &curr_loc,bool white_turn){
   rank = int(row) - 2;
   files = col + 1;
   if(is_valid_move(rank,files) && findKey(search_mp,files+to_string(rank)) == "null") {
-  ans.push_back(files + to_string(rank));
+    ans.push_back(files + to_string(rank));
   }
 
 
 
-  
+
 
 
   // left long up diagonal move
   rank = int(row) + 1;
   files = col - 2;
   if(is_valid_move(rank,files) && findKey(search_mp,files+to_string(rank)) == "null") {
-  ans.push_back(files + to_string(rank));
+    ans.push_back(files + to_string(rank));
   }
 
   // right long up diagonal move
   rank = int(row) + 1;
   files = col + 2;
   if(is_valid_move(rank,files) && findKey(search_mp,files+to_string(rank)) == "null") {
-  ans.push_back(files + to_string(rank));
+    ans.push_back(files + to_string(rank));
   }
 
 
@@ -174,7 +261,7 @@ vector<string> knight_valid_move(string &curr_loc,bool white_turn){
   rank = int(row) - 1;
   files = col - 2;
   if(is_valid_move(rank,files) && findKey(search_mp,files+to_string(rank)) == "null") {
-  ans.push_back(files + to_string(rank));
+    ans.push_back(files + to_string(rank));
   }
 
 
@@ -183,7 +270,7 @@ vector<string> knight_valid_move(string &curr_loc,bool white_turn){
   rank = int(row) - 1;
   files = col + 2;
   if(is_valid_move(rank,files) && findKey(search_mp,files+to_string(rank)) == "null") {
-  ans.push_back(files + to_string(rank));
+    ans.push_back(files + to_string(rank));
   }
 
 
@@ -214,7 +301,7 @@ void play(){
 
 
   white_piece = {
-    {"R1","A1"},
+    {"R1","D5"},
     {"R2","H1"},
     {"N1","B1"},
     {"N2","G1"},
@@ -238,8 +325,8 @@ void play(){
   int cnt  = 10;
   bool white_turn = true;
   while(cnt--){
-    
-      print_board();
+
+    print_board(white_turn);
 
     cout << (white_turn ? "white turn!!\n": "black turn!!\n");
 
@@ -252,6 +339,12 @@ void play(){
     if(choose_piece[0] == 'N'){
       string loc = white_turn ? white_piece[choose_piece] : black_piece[choose_piece];
       vector<string>ans = knight_valid_move(loc,white_turn);
+      debug(ans);
+    }
+
+    if(choose_piece[0] == 'R'){
+      string loc = white_turn ? white_piece[choose_piece] : black_piece[choose_piece];
+      vector<string>ans = rook_valid_move(loc,white_turn);
       debug(ans);
     }
 
@@ -296,3 +389,4 @@ int main() {
   c.play();
   return 0;
 }
+
