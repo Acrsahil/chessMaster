@@ -276,6 +276,15 @@ vector<string> bisap_valid_move(string &curr_loc, bool white_turn){
   return ans;
 }
 
+private:
+
+vector<string> queen_valid_move(string &curr_loc,bool white_turn){
+  vector<string> ans = rook_valid_move(curr_loc,white_turn);
+  vector<string> ans2 = bisap_valid_move(curr_loc,white_turn);
+  ans.insert(ans.end(),ans2.begin(),ans2.end());
+  return ans;
+}
+
 
 
 private:
@@ -390,11 +399,11 @@ void play(){
 
   white_piece = {
     {"R1","A1"},
-    {"R2","H1"},
+    {"R2","C1"},
     {"N1","B1"},
     {"N2","G1"},
     {"B1","F1"},
-    {"Q","E1"},
+    {"Q","D5"}, // previous E1
     {"K","D1"},
     {"B2","D5"},
     {"N2","B1"},
@@ -436,6 +445,10 @@ void play(){
       string loc = white_turn ? white_piece[choose_piece] : black_piece[choose_piece];
       vector<string>ans = bisap_valid_move(loc,white_turn);
       debug(ans);
+    }else if(choose_piece[0] == 'Q'){
+      string loc = white_turn ? white_piece[choose_piece] : black_piece[choose_piece];
+      vector<string>ans = queen_valid_move(loc,white_turn);
+      debug(ans);
     }
 
     string choose_location;
@@ -468,7 +481,8 @@ void play(){
     white_turn = !white_turn;
     debug(move_history);
   }
-}
+  }
+
 };
 
 
@@ -479,4 +493,3 @@ int main() {
   c.play();
   return 0;
 }
-
