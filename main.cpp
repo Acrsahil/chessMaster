@@ -285,6 +285,85 @@ vector<string> queen_valid_move(string &curr_loc,bool white_turn){
   return ans;
 }
 
+private: 
+bool is_eligiable_loc(int rank,char files,bool white_turn){
+    string next_loc = files+to_string(rank);
+    if(white_turn){
+      if(findKey(white_piece,next_loc) == "null") return true;
+      if(findKey(black_piece,next_loc) != "null") return true;
+    }else{
+      if(findKey(black_piece,next_loc) == "null") return true;
+      if(findKey(white_piece,next_loc) != "null") return true;
+    }
+return false;
+}
+
+vector<string> king_valid_move(string &curr_loc,bool white_turn){
+    vector<string> ans;
+    map<string,string>search_mp = white_turn ? white_piece : black_piece;
+    char col  =  curr_loc[0];
+    int row = curr_loc[1]-'0'; // converting to integer
+
+
+    // up move
+    int rank = row;
+    char files = col;
+    rank++;
+    if(is_eligiable_loc(rank,files,white_turn)) ans.push_back(files+to_string(rank));
+
+
+    // down move
+    rank = row;
+    files = col;
+    rank--;
+    if(is_eligiable_loc(rank,files,white_turn)) ans.push_back(files+to_string(rank));
+
+
+    // left move
+    rank = row;
+    files = col;
+    files--;
+    if(is_eligiable_loc(rank,files,white_turn)) ans.push_back(files+to_string(rank));
+
+    // right move
+    rank = row;
+    files = col;
+    files++;
+    if(is_eligiable_loc(rank,files,white_turn)) ans.push_back(files+to_string(rank));
+
+
+    // up left diagonal
+    rank = row;
+    files = col;
+    files--;
+    rank++;
+    if(is_eligiable_loc(rank,files,white_turn)) ans.push_back(files+to_string(rank));
+
+
+
+    // up right diagonal
+    rank = row;
+    files = col;
+    files++;
+    rank++;
+    if(is_eligiable_loc(rank,files,white_turn)) ans.push_back(files+to_string(rank));
+
+    // down left diagonal
+    rank = row;
+    files = col;
+    files--;
+    rank--;
+    if(is_eligiable_loc(rank,files,white_turn)) ans.push_back(files+to_string(rank));
+
+    // down right diagonal
+    rank = row;
+    files = col;
+    files++;
+    rank--;
+    if(is_eligiable_loc(rank,files,white_turn)) ans.push_back(files+to_string(rank));
+    return ans;
+}
+
 
 
 private:
@@ -403,8 +482,8 @@ void play(){
     {"N1","B1"},
     {"N2","G1"},
     {"B1","F1"},
-    {"Q","D5"}, // previous E1
-    {"K","D1"},
+    {"Q","E1"}, // previous E1
+    {"K","D5"},
     {"B2","D5"},
     {"N2","B1"},
     {"R2","A1"},
@@ -445,9 +524,14 @@ void play(){
       string loc = white_turn ? white_piece[choose_piece] : black_piece[choose_piece];
       vector<string>ans = bisap_valid_move(loc,white_turn);
       debug(ans);
-    }else if(choose_piece[0] == 'Q'){
+    }
+    else if(choose_piece[0] == 'Q'){
       string loc = white_turn ? white_piece[choose_piece] : black_piece[choose_piece];
       vector<string>ans = queen_valid_move(loc,white_turn);
+      debug(ans);
+    } else if(choose_piece[0] == 'K'){
+      string loc = white_turn ? white_piece[choose_piece] : black_piece[choose_piece];
+      vector<string>ans = king_valid_move(loc,white_turn);
       debug(ans);
     }
 
@@ -481,7 +565,7 @@ void play(){
     white_turn = !white_turn;
     debug(move_history);
   }
-  }
+}
 
 };
 
