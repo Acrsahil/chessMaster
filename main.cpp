@@ -108,6 +108,8 @@ string emojiOfPiece(string piece_notation,int white_turn){
 }
 
 
+
+
 private:
 vector<string> rook_valid_move(string &curr_loc, bool white_turn){
   
@@ -189,6 +191,93 @@ vector<string> rook_valid_move(string &curr_loc, bool white_turn){
   return ans;
     
 }
+
+private:
+
+vector<string> bisap_valid_move(string &curr_loc, bool white_turn){
+    vector<string> ans;
+    map<string,string>search_mp = white_turn ? white_piece : black_piece;
+    char col  =  curr_loc[0];
+    int row = curr_loc[1]-'0'; // converting to integer
+
+    // right up diagonal
+    int rank = row;
+    char files = col;
+    
+    while(rank <= 8 && files <= 'H'){
+      if(rank != row) ans.push_back(files + to_string(rank));
+      if(findKey(search_mp,char(files+1) + to_string(rank+1)) != "null") break;
+
+        if(white_turn){
+          if(findKey(black_piece,files + to_string(rank)) != "null") break;
+        }else{
+          if(findKey(black_piece,files + to_string(rank)) != "null") break;
+        }
+      rank++;
+      files++;
+    }
+
+    // right down diagonal
+     rank = row;
+     files = col;
+    
+    while(rank >= 1 && files >= 'A'){
+      if(rank != row) ans.push_back(files + to_string(rank));
+      if(findKey(search_mp,char(files-1) + to_string(rank-1)) != "null") break;
+
+        if(white_turn){
+          if(findKey(black_piece,files + to_string(rank)) != "null") break;
+        }else{
+          if(findKey(black_piece,files + to_string(rank)) != "null") break;
+        }
+      rank--;
+      files--;
+    }
+
+
+    // left up diagonal
+     rank = row;
+     files = col;
+    
+    while(rank <= 8 && files >= 'A'){
+      if(rank != row) ans.push_back(files + to_string(rank));
+      if(findKey(search_mp,char(files-1) + to_string(rank+1)) != "null") break;
+
+        if(white_turn){
+          if(findKey(black_piece,files + to_string(rank)) != "null") break;
+        }else{
+          if(findKey(black_piece,files + to_string(rank)) != "null") break;
+        }
+      rank++;
+      files--;
+    }
+
+
+    // right down diagonal
+     rank = row;
+     files = col;
+    
+    while(rank >= 1 && files <= 'H'){
+      if(rank != row) ans.push_back(files + to_string(rank));
+      if(findKey(search_mp,char(files+1) + to_string(rank-1)) != "null") break;
+
+        if(white_turn){
+          if(findKey(black_piece,files + to_string(rank)) != "null") break;
+        }else{
+          if(findKey(black_piece,files + to_string(rank)) != "null") break;
+        }
+      rank--;
+      files++;
+    }
+
+
+
+
+  return ans;
+}
+
+
+
 private:
 vector<string> knight_valid_move(string &curr_loc,bool white_turn){
   // first move 
@@ -273,7 +362,6 @@ vector<string> knight_valid_move(string &curr_loc,bool white_turn){
     ans.push_back(files + to_string(rank));
   }
 
-
   return ans;
 }
 
@@ -301,14 +389,14 @@ void play(){
 
 
   white_piece = {
-    {"R1","D5"},
+    {"R1","A1"},
     {"R2","H1"},
     {"N1","B1"},
     {"N2","G1"},
     {"B1","F1"},
     {"Q","E1"},
     {"K","D1"},
-    {"B2","C1"},
+    {"B2","D5"},
     {"N2","B1"},
     {"R2","A1"},
     {"P1","A2"}, // change A2-> A4
@@ -340,11 +428,13 @@ void play(){
       string loc = white_turn ? white_piece[choose_piece] : black_piece[choose_piece];
       vector<string>ans = knight_valid_move(loc,white_turn);
       debug(ans);
-    }
-
-    if(choose_piece[0] == 'R'){
+    }else if(choose_piece[0] == 'R'){
       string loc = white_turn ? white_piece[choose_piece] : black_piece[choose_piece];
       vector<string>ans = rook_valid_move(loc,white_turn);
+      debug(ans);
+    }else if(choose_piece[0] == 'B'){
+      string loc = white_turn ? white_piece[choose_piece] : black_piece[choose_piece];
+      vector<string>ans = bisap_valid_move(loc,white_turn);
       debug(ans);
     }
 
