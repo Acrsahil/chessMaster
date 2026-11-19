@@ -39,6 +39,8 @@ class chess{
 public:
   map<string,string>black_piece;
   map<string,string>white_piece;
+  map<string,bool>pawn_double_white_move;
+  map<string,bool>pawn_double_black_move;
 
 private:
   string findKey(map<string, string>& mp, string target) {
@@ -52,7 +54,6 @@ private:
 
 private:
 void print_board(bool white_turn,vector<string> legal_moves = {""}){
-  debug(legal_moves);
   for(int i = 7; i >= 0; i--){
     for(int j = 7; j >= 0; j--){
       int is_white_piece = 1;
@@ -71,8 +72,6 @@ void print_board(bool white_turn,vector<string> legal_moves = {""}){
     }
     cout << "|"<< endl;
   }
-
-
 }
 
 
@@ -86,6 +85,11 @@ bool is_valid_move(int rank,char files){
 private:
 string emojiOfPiece(string piece_notation,int white_turn, vector<string> &legal_moves,string location = ""){
 
+  if(!location.empty()){
+    for(auto i : legal_moves){
+      if(i == location) return "X";
+    }
+  }
   // Adding White Emoji for game
   if(white_turn == 1){
     if(piece_notation[0]=='P') return "♙";
@@ -105,11 +109,6 @@ string emojiOfPiece(string piece_notation,int white_turn, vector<string> &legal_
     else if(piece_notation[0]=='R') return "♜";
     else if(piece_notation[0]=='Q') return "♛";
     else if(piece_notation[0]=='K') return "♚";
-  }
-  if(!location.empty()){
-    for(auto i : legal_moves){
-      if(i == location) return "X";
-    }
   }
 
   return ".";
@@ -279,7 +278,6 @@ vector<string> bisap_valid_move(string &curr_loc, bool white_turn){
 
 
 
-
   return ans;
 }
 
@@ -302,6 +300,72 @@ bool is_eligiable_loc(int rank,char files,bool white_turn){
     if(findKey(white_piece,next_loc) != "null") return true;
   }
   return false;
+}
+
+
+
+
+bool is_pawn_double_move(int rank,char files,vector<string> &search_piece){
+
+  return true;
+}
+
+vector<string> pawn_valid_move(string &curr_loc,bool white_turn){
+  // single move
+  vector<string> ans;
+  char col  =  curr_loc[0];
+  int row = curr_loc[1]-'0'; // converting to integer
+
+  if(white_turn){
+    // single move check
+    int rank = row+1;
+    char files = col;
+    if( is_eligiable_loc(rank,files,white_turn) && findKey(white_piece,files+to_string(rank)) == "null") ans.push_back(files+to_string(rank));
+
+    // left capture move check
+    rank = row+1;
+    files = col-1;
+    if( is_eligiable_loc(rank,files,white_turn) && findKey(black_piece,files+to_string(rank)) != "null") ans.push_back(files+to_string(rank));
+
+    // right capture move check
+    rank = row+1;
+    files = col+1;
+    if( is_eligiable_loc(rank,files,white_turn) && findKey(black_piece,files+to_string(rank)) != "null") ans.push_back(files+to_string(rank));
+
+    // double move check
+    rank = row+2;
+    files = col;
+    string curr_piece = findKey(white_piece,col+to_string(row));
+    if( is_eligiable_loc(rank,files,white_turn) && pawn_double_white_move[curr_piece] && findKey(white_piece,files+to_string(rank-1)) == "null" ){
+      ans.push_back(files+to_string(rank));
+      pawn_double_white_move[curr_piece] = false;
+    } 
+
+  }else{
+    int rank = row-1;
+    char files = col;
+    if( is_eligiable_loc(rank,files,!white_turn) && findKey(black_piece,files+to_string(rank)) == "null") ans.push_back(files+to_string(rank));
+
+    // left capture move check
+    rank = row-1;
+    files = col-1;
+    if( is_eligiable_loc(rank,files,!white_turn) && findKey(white_piece,files+to_string(rank)) != "null") ans.push_back(files+to_string(rank));
+
+    // right capture move check
+    rank = row-1;
+    files = col+1;
+    if( is_eligiable_loc(rank,files,!white_turn) && findKey(white_piece,files+to_string(rank)) != "null") ans.push_back(files+to_string(rank));
+
+    // double move check
+    rank = row-2;
+    files = col;
+    string curr_piece = findKey(black_piece,col+to_string(row));
+    if(is_eligiable_loc(rank,files,white_turn) && pawn_double_black_move[curr_piece] && findKey(white_piece,files+to_string(rank)) == "null" && findKey(white_piece,files+to_string(rank-1)) == "null"){
+      ans.push_back(files+to_string(rank));
+      pawn_double_black_move[curr_piece] = false;
+    } 
+  }
+  return ans;
 }
 
 vector<string> king_valid_move(string &curr_loc,bool white_turn){
@@ -478,8 +542,17 @@ void play(){
     {"P6","C7"},
     {"P7","B7"},
     {"P8","A7"}
+  }; 
+  pawn_double_black_move = {
+    {"P1",false},
+    {"P2",false},
+    {"P3",false},
+    {"P4",false},
+    {"P5",false},
+    {"P6",false},
+    {"P7",false},
+    {"P8",false}
   };
-
 
 
   white_piece = {
@@ -503,52 +576,68 @@ void play(){
     {"P8","H2"}
   };
 
+  pawn_double_white_move = {
+    {"P1",true},
+    {"P2",true},
+    {"P3",true},
+    {"P4",true},
+    {"P5",true},
+    {"P6",true},
+    {"P7",true},
+    {"P8",true}
+  };
+
+  pawn_double_black_move = {
+    {"P1",true},
+    {"P2",true},
+    {"P3",true},
+    {"P4",true},
+    {"P5",true},
+    {"P6",true},
+    {"P7",true},
+    {"P8",true}
+  };
+
   vector<pair<string,string>>move_history;
   int cnt  = 10;
   bool white_turn = true;
   while(cnt--){
 
-    print_board(white_turn);
 
-    cout << (white_turn ? "white turn!!\n": "black turn!!\n");
+    cout << (white_turn ? " ############# *white turn* #############\n": " ############# *black turn* #############\n");
+    print_board(white_turn);
 
     string choose_piece;
     vector<string> ans;
-    cout << "Choose Piece? " << endl;
+    cout << "Choose Piece? ";
     cin >> choose_piece; // P1
 
-    cout << "You have choose Piece-> " << choose_piece << endl;
 
     if(choose_piece[0] == 'N'){
       string loc = white_turn ? white_piece[choose_piece] : black_piece[choose_piece];
       ans = knight_valid_move(loc,white_turn);
-      debug(ans);
-
-
     }else if(choose_piece[0] == 'R'){
       string loc = white_turn ? white_piece[choose_piece] : black_piece[choose_piece];
       ans = rook_valid_move(loc,white_turn);
-      debug(ans);
     }else if(choose_piece[0] == 'B'){
       string loc = white_turn ? white_piece[choose_piece] : black_piece[choose_piece];
       ans = bisap_valid_move(loc,white_turn);
-      debug(ans);
     }
     else if(choose_piece[0] == 'Q'){
       string loc = white_turn ? white_piece[choose_piece] : black_piece[choose_piece];
       ans = queen_valid_move(loc,white_turn);
-      debug(ans);
     } else if(choose_piece[0] == 'K'){
       string loc = white_turn ? white_piece[choose_piece] : black_piece[choose_piece];
       ans = king_valid_move(loc,white_turn);
-      debug(ans);
+    }else if(choose_piece[0] == 'P'){
+      string loc = white_turn ? white_piece[choose_piece] : black_piece[choose_piece];
+      ans = pawn_valid_move(loc,white_turn);
     }
     print_board(white_turn,ans);
-
+    debug(ans);
     string choose_location;
-    cout << "Choose Location? " << endl;
+    cout << "Choose Location? ";
     cin >> choose_location; // A4
-
 
     bool is_valid_moves = false;
     for(auto i : ans){
@@ -559,7 +648,6 @@ void play(){
     }
 
     if(is_valid_moves){
-      cout << "You have choose Location-> " << choose_location << endl;
 
       // capture rule
       if(white_turn) {
