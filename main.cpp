@@ -346,7 +346,7 @@ vector<string> pawn_valid_move(string &curr_loc,bool white_turn){
         && findKey(white_piece,files+to_string(rank-1)) == "null" 
       ){
       ans.push_back(files+to_string(rank));
-      pawn_double_black_move[curr_piece] = false;
+      pawn_double_white_move[curr_piece] = false;
     } 
 
   }else{
