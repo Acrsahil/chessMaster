@@ -320,7 +320,9 @@ vector<string> pawn_valid_move(string &curr_loc,bool white_turn){
     // single move check
     int rank = row+1;
     char files = col;
-    if( is_eligiable_loc(rank,files,white_turn) && findKey(white_piece,files+to_string(rank)) == "null") ans.push_back(files+to_string(rank));
+    if( is_eligiable_loc(rank,files,white_turn) 
+        && findKey(white_piece,files+to_string(rank)) == "null" 
+        && findKey(black_piece,files+to_string(rank)) == "null") ans.push_back(files+to_string(rank));
 
     // left capture move check
     rank = row+1;
@@ -336,15 +338,23 @@ vector<string> pawn_valid_move(string &curr_loc,bool white_turn){
     rank = row+2;
     files = col;
     string curr_piece = findKey(white_piece,col+to_string(row));
-    if( is_eligiable_loc(rank,files,white_turn) && pawn_double_white_move[curr_piece] && findKey(white_piece,files+to_string(rank-1)) == "null" ){
+    if(is_eligiable_loc(rank,files,white_turn) 
+        && findKey(black_piece,files+to_string(rank)) == "null" 
+        && findKey(black_piece,files+to_string(rank-1)) == "null"
+        && pawn_double_white_move[curr_piece] 
+        && findKey(white_piece,files+to_string(rank)) == "null" 
+        && findKey(white_piece,files+to_string(rank-1)) == "null" 
+      ){
       ans.push_back(files+to_string(rank));
-      pawn_double_white_move[curr_piece] = false;
+      pawn_double_black_move[curr_piece] = false;
     } 
 
   }else{
     int rank = row-1;
     char files = col;
-    if( is_eligiable_loc(rank,files,!white_turn) && findKey(black_piece,files+to_string(rank)) == "null") ans.push_back(files+to_string(rank));
+    if( is_eligiable_loc(rank,files,!white_turn) 
+        && findKey(black_piece,files+to_string(rank)) == "null" 
+        && findKey(white_piece,files+to_string(rank)) == "null") ans.push_back(files+to_string(rank));
 
     // left capture move check
     rank = row-1;
@@ -360,11 +370,18 @@ vector<string> pawn_valid_move(string &curr_loc,bool white_turn){
     rank = row-2;
     files = col;
     string curr_piece = findKey(black_piece,col+to_string(row));
-    if(is_eligiable_loc(rank,files,white_turn) && pawn_double_black_move[curr_piece] && findKey(white_piece,files+to_string(rank)) == "null" && findKey(white_piece,files+to_string(rank-1)) == "null"){
+    if(is_eligiable_loc(rank,files,white_turn) 
+        && findKey(black_piece,files+to_string(rank)) == "null" 
+        && findKey(black_piece,files+to_string(rank+1)) == "null"
+        && pawn_double_black_move[curr_piece] 
+        && findKey(white_piece,files+to_string(rank)) == "null" 
+        && findKey(white_piece,files+to_string(rank+1)) == "null" 
+      ){
       ans.push_back(files+to_string(rank));
       pawn_double_black_move[curr_piece] = false;
     } 
   }
+
   return ans;
 }
 
