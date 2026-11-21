@@ -30,7 +30,6 @@ template <class T> void _print(unordered_set<T> v) { cerr << "[ "; for (T i : v)
 template <class T> void _print(unordered_multiset<T> v) { cerr << "[ "; for (T i : v) { _print(i); cerr << " "; } cerr << "]"; }
 template <class T, class V> void _print(unordered_map<T, V> v) { cerr << "[ "; for (auto i : v) { _print(i); cerr << " "; } cerr << "]"; }
 
-
 vector<vector<string>> board(8,vector<string>(8));
 
 
@@ -51,6 +50,19 @@ private:
     }
     return "null"; // Not found
 }
+
+private:
+
+int search_number_of_piece(bool white_turn,map<string,string>& mp,char piece){
+  int cnt = 0;
+  for(auto i : mp){
+    if(i.first[0] == piece){
+      cnt++;
+    }
+  }
+  return cnt;
+}
+
 
 private:
 void print_board(bool white_turn,vector<string> legal_moves = {""}){
@@ -93,22 +105,22 @@ string emojiOfPiece(string piece_notation,int white_turn, vector<string> &legal_
   // Adding White Emoji for game
   if(white_turn == 1){
     if(piece_notation[0]=='P') return "♙";
-    else if(piece_notation[0]=='N') return "♘";
-    else if(piece_notation[0]=='B') return "♗";
-    else if(piece_notation[0]=='R') return "♖";
-    else if(piece_notation[0]=='Q') return "♕";
-    else if(piece_notation[0]=='K') return "♔";
+    else if(piece_notation[0]=='N' && white_piece[piece_notation] != "X") return "♘";
+    else if(piece_notation[0]=='B' && white_piece[piece_notation] != "X") return "♗";
+    else if(piece_notation[0]=='R' && white_piece[piece_notation] != "X") return "♖";
+    else if(piece_notation[0]=='Q' && white_piece[piece_notation] != "X") return "♕";
+    else if(piece_notation[0]=='K' && white_piece[piece_notation] != "X") return "♔";
 
   }else if(white_turn == 0){
     // Adding Black Emoji for game
 
 
     if(piece_notation[0]=='P') return "♟";
-    else if(piece_notation[0]=='N') return "♞";
-    else if(piece_notation[0]=='B') return "♝";
-    else if(piece_notation[0]=='R') return "♜";
-    else if(piece_notation[0]=='Q') return "♛";
-    else if(piece_notation[0]=='K') return "♚";
+    else if(piece_notation[0]=='N' && black_piece[piece_notation] != "X") return "♞";
+    else if(piece_notation[0]=='B' && black_piece[piece_notation] != "X") return "♝";
+    else if(piece_notation[0]=='R' && black_piece[piece_notation] != "X") return "♜";
+    else if(piece_notation[0]=='Q' && black_piece[piece_notation] != "X") return "♛";
+    else if(piece_notation[0]=='K' && black_piece[piece_notation] != "X") return "♚";
   }
 
   return ".";
@@ -310,35 +322,45 @@ bool is_pawn_double_move(int rank,char files,vector<string> &search_piece){
   return true;
 }
 
+
+string pawn_new_piece_opening(bool white_turn,map<string,string> &mp){
+  char choose_piece;
+  cout << "Choose Piece Between Rook->'R' Queen->'Q' Bisap->'B' Knight->'N' ";
+  cin >> choose_piece;
+  int cnt = search_number_of_piece(white_turn,mp,choose_piece) + 1;
+  string new_piece = choose_piece + to_string(cnt);
+  return new_piece;
+}
+
 vector<string> pawn_valid_move(string &curr_loc,bool white_turn){
   // single move
   vector<string> ans;
-  char col  =  curr_loc[0];
+    char col  =  curr_loc[0];
   int row = curr_loc[1]-'0'; // converting to integer
 
   if(white_turn){
     // single move check
     int rank = row+1;
     char files = col;
-    if( is_eligiable_loc(rank,files,white_turn) 
+    if( is_eligiable_loc(rank,files,white_turn) && is_valid_move(rank,files)
         && findKey(white_piece,files+to_string(rank)) == "null" 
         && findKey(black_piece,files+to_string(rank)) == "null") ans.push_back(files+to_string(rank));
 
     // left capture move check
     rank = row+1;
     files = col-1;
-    if( is_eligiable_loc(rank,files,white_turn) && findKey(black_piece,files+to_string(rank)) != "null") ans.push_back(files+to_string(rank));
+    if( is_valid_move(rank,files) && is_eligiable_loc(rank,files,white_turn) && findKey(black_piece,files+to_string(rank)) != "null") ans.push_back(files+to_string(rank));
 
     // right capture move check
     rank = row+1;
     files = col+1;
-    if( is_eligiable_loc(rank,files,white_turn) && findKey(black_piece,files+to_string(rank)) != "null") ans.push_back(files+to_string(rank));
+    if( is_valid_move(rank,files) && is_eligiable_loc(rank,files,white_turn) && findKey(black_piece,files+to_string(rank)) != "null") ans.push_back(files+to_string(rank));
 
     // double move check
     rank = row+2;
     files = col;
     string curr_piece = findKey(white_piece,col+to_string(row));
-    if(is_eligiable_loc(rank,files,white_turn) 
+    if( is_valid_move(rank,files) && is_eligiable_loc(rank,files,white_turn) 
         && findKey(black_piece,files+to_string(rank)) == "null" 
         && findKey(black_piece,files+to_string(rank-1)) == "null"
         && pawn_double_white_move[curr_piece] 
@@ -352,25 +374,25 @@ vector<string> pawn_valid_move(string &curr_loc,bool white_turn){
   }else{
     int rank = row-1;
     char files = col;
-    if( is_eligiable_loc(rank,files,!white_turn) 
+    if( is_valid_move(rank,files) && is_eligiable_loc(rank,files,!white_turn) 
         && findKey(black_piece,files+to_string(rank)) == "null" 
         && findKey(white_piece,files+to_string(rank)) == "null") ans.push_back(files+to_string(rank));
 
     // left capture move check
     rank = row-1;
     files = col-1;
-    if( is_eligiable_loc(rank,files,!white_turn) && findKey(white_piece,files+to_string(rank)) != "null") ans.push_back(files+to_string(rank));
+    if( is_valid_move(rank,files) && is_eligiable_loc(rank,files,!white_turn) && findKey(white_piece,files+to_string(rank)) != "null") ans.push_back(files+to_string(rank));
 
     // right capture move check
     rank = row-1;
     files = col+1;
-    if( is_eligiable_loc(rank,files,!white_turn) && findKey(white_piece,files+to_string(rank)) != "null") ans.push_back(files+to_string(rank));
+    if( is_valid_move(rank,files) && is_eligiable_loc(rank,files,!white_turn) && findKey(white_piece,files+to_string(rank)) != "null") ans.push_back(files+to_string(rank));
 
     // double move check
     rank = row-2;
     files = col;
     string curr_piece = findKey(black_piece,col+to_string(row));
-    if(is_eligiable_loc(rank,files,white_turn) 
+    if( is_valid_move(rank,files) && is_eligiable_loc(rank,files,white_turn) 
         && findKey(black_piece,files+to_string(rank)) == "null" 
         && findKey(black_piece,files+to_string(rank+1)) == "null"
         && pawn_double_black_move[curr_piece] 
@@ -560,16 +582,6 @@ void play(){
     {"P7","B7"},
     {"P8","A7"}
   }; 
-  pawn_double_black_move = {
-    {"P1",false},
-    {"P2",false},
-    {"P3",false},
-    {"P4",false},
-    {"P5",false},
-    {"P6",false},
-    {"P7",false},
-    {"P8",false}
-  };
 
 
   white_piece = {
@@ -592,7 +604,6 @@ void play(){
     {"P7","G2"},
     {"P8","H2"}
   };
-
   pawn_double_white_move = {
     {"P1",true},
     {"P2",true},
@@ -678,8 +689,24 @@ void play(){
 
 
       // after move setting new location
-      if (white_turn) white_piece[choose_piece] = choose_location;
-      else black_piece[choose_piece] = choose_location;
+      if (white_turn){
+        if(choose_piece[0] == 'P' && choose_location[1] == '8'){
+          white_piece[choose_piece] = "X";
+          string new_piece =  pawn_new_piece_opening(white_turn,white_piece);
+          white_piece[new_piece] = choose_location;
+        }else{
+          white_piece[choose_piece] = choose_location;
+        }
+      } else {
+        if(choose_piece[0] == 'P' && choose_location[1] == '1'){
+          black_piece[choose_piece] = "X";
+          string new_piece =  pawn_new_piece_opening(white_turn,black_piece);
+          black_piece[new_piece] = choose_location;
+        }else{
+          black_piece[choose_piece] = choose_location;
+        }
+      }
+
 
       // storing all moves in location
       move_history.push_back({choose_piece,choose_location});
@@ -696,10 +723,7 @@ void play(){
 
   }
 }
-
 };
-
-
 
 
 int main() {
