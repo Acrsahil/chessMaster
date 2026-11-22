@@ -295,8 +295,7 @@ vector<string> bisap_valid_move(string &curr_loc, bool white_turn){
 
 private:
 vector<string> queen_valid_move(string &curr_loc,bool white_turn){
-  vector<string> ans = rook_valid_move(curr_loc,white_turn);
-  vector<string> ans2 = bisap_valid_move(curr_loc,white_turn);
+  vector<string> ans = rook_valid_move(curr_loc,white_turn), ans2 = bisap_valid_move(curr_loc,white_turn);
   ans.insert(ans.end(),ans2.begin(),ans2.end());
   return ans;
 }
@@ -305,11 +304,11 @@ private:
 bool is_eligiable_loc(int rank,char files,bool white_turn){
   string next_loc = files+to_string(rank);
   if(white_turn){
-    if(findKey(white_piece,next_loc) == "null") return true;
-    if(findKey(black_piece,next_loc) != "null") return true;
+    if(findKey(white_piece,next_loc) == "null" && findKey(black_piece,next_loc) == "null" ) return true;
+    // if(findKey(black_piece,next_loc) != "null") return true;
   }else{
     if(findKey(black_piece,next_loc) == "null") return true;
-    if(findKey(white_piece,next_loc) != "null") return true;
+    // if(findKey(white_piece,next_loc) != "null") return true;
   }
   return false;
 }
@@ -363,7 +362,7 @@ vector<string> pawn_valid_move(string &curr_loc,bool white_turn){
     if( is_valid_move(rank,files) && is_eligiable_loc(rank,files,white_turn) 
         && findKey(black_piece,files+to_string(rank)) == "null" 
         && findKey(black_piece,files+to_string(rank-1)) == "null"
-        && pawn_double_white_move[curr_piece] 
+        && rank-2 == 2
         && findKey(white_piece,files+to_string(rank)) == "null" 
         && findKey(white_piece,files+to_string(rank-1)) == "null" 
       ){
@@ -395,7 +394,7 @@ vector<string> pawn_valid_move(string &curr_loc,bool white_turn){
     if( is_valid_move(rank,files) && is_eligiable_loc(rank,files,white_turn) 
         && findKey(black_piece,files+to_string(rank)) == "null" 
         && findKey(black_piece,files+to_string(rank+1)) == "null"
-        && pawn_double_black_move[curr_piece] 
+        && rank+2 == 7
         && findKey(white_piece,files+to_string(rank)) == "null" 
         && findKey(white_piece,files+to_string(rank+1)) == "null" 
       ){
@@ -523,10 +522,6 @@ vector<string> knight_valid_move(string &curr_loc,bool white_turn){
   }
 
 
-
-
-
-
   // left long up diagonal move
   rank = int(row) + 1;
   files = col - 2;
@@ -603,27 +598,6 @@ void play(){
     {"P6","F2"},
     {"P7","G2"},
     {"P8","H2"}
-  };
-  pawn_double_white_move = {
-    {"P1",true},
-    {"P2",true},
-    {"P3",true},
-    {"P4",true},
-    {"P5",true},
-    {"P6",true},
-    {"P7",true},
-    {"P8",true}
-  };
-
-  pawn_double_black_move = {
-    {"P1",true},
-    {"P2",true},
-    {"P3",true},
-    {"P4",true},
-    {"P5",true},
-    {"P6",true},
-    {"P7",true},
-    {"P8",true}
   };
 
   vector<pair<string,string>>move_history;
