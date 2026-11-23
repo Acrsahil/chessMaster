@@ -38,8 +38,7 @@ class chess{
 public:
   map<string,string>black_piece;
   map<string,string>white_piece;
-  map<string,bool>pawn_double_white_move;
-  map<string,bool>pawn_double_black_move;
+  vector<pair<string,string>> n_pawn_piece;
 
 private:
   string findKey(map<string, string>& mp, string target) {
@@ -311,6 +310,15 @@ bool is_eligiable_loc(int rank,char files,bool white_turn){
   return false;
 }
 
+
+string pawn_contains_n_pawn(string &choose_location){
+  for(auto i : n_pawn_piece){
+    debug(i);
+    if(i.second == choose_location) return i.first;
+  }
+  return "null";
+}
+
 int cnt_piece_move_history(vector<pair<string,string>> &move_history,string &last_piece,bool &white_turn){
   int cnt = 0;
   for(int i = 0; i<move_history.size(); i++){
@@ -339,19 +347,19 @@ string n_pawn_move(vector<pair<string,string>> &move_history , bool &white_turn,
         if(press_piece_location[0] - 1 == m_back.second[0]){ // left contion 
           int rank = (press_piece_location[1]-'0') + 1;
           char files = press_piece_location[0] -1;
-          black_piece[m_back.first] = "X";
+          n_pawn_piece.push_back({m_back.first,files+to_string(rank)});
           return files + to_string(rank);
         }else if(press_piece_location[0] + 1 == m_back.second[0]){ // right
           int rank = (press_piece_location[1]-'0') + 1;
           char files = press_piece_location[0] +1;
-          black_piece[m_back.first] = "X";
+          n_pawn_piece.push_back({m_back.first,files+to_string(rank)});
           return files + to_string(rank);
         }
 
       }
     }
     }
-  }else{
+  }else{ // black case
 
     if(press_piece_location[1] == '4'){ // first condition approved
       pair<string,string> m_back = move_history.back(); // {"P4",D5}
@@ -362,13 +370,13 @@ string n_pawn_move(vector<pair<string,string>> &move_history , bool &white_turn,
                                                           // left
         if(press_piece_location[0] - 1 == m_back.second[0]){ // left contion 
           int rank = (press_piece_location[1]-'0') - 1;
-          char files = press_piece_location[0] +1;
-          black_piece[m_back.first] = "X";
+          char files = press_piece_location[0] -1;
+          n_pawn_piece.push_back({m_back.first,files+to_string(rank)});
           return files + to_string(rank);
         }else if(press_piece_location[0] + 1 == m_back.second[0]){ // right
           int rank = (press_piece_location[1]-'0') - 1;
-          char files = press_piece_location[0] -1;
-          black_piece[m_back.first] = "X";
+          char files = press_piece_location[0] +1;
+          n_pawn_piece.push_back({m_back.first,files+to_string(rank)});
           return files + to_string(rank);
         }
 
@@ -397,7 +405,7 @@ vector<string> pawn_valid_move(string &curr_loc,bool white_turn,vector<pair<stri
 
   if(white_turn){
     // single move check
-    int rank = row+1;
+    int rank = row+1;                    
     char files = col;
     if( is_eligiable_loc(rank,files,white_turn) && is_valid_move(rank,files)
         && findKey(white_piece,files+to_string(rank)) == "null" 
@@ -425,7 +433,6 @@ vector<string> pawn_valid_move(string &curr_loc,bool white_turn,vector<pair<stri
         && findKey(white_piece,files+to_string(rank-1)) == "null" 
       ){
       ans.push_back(files+to_string(rank));
-      pawn_double_white_move[curr_piece] = false;
     } 
 
   }else{
@@ -457,7 +464,6 @@ vector<string> pawn_valid_move(string &curr_loc,bool white_turn,vector<pair<stri
         && findKey(white_piece,files+to_string(rank+1)) == "null" 
       ){
       ans.push_back(files+to_string(rank));
-      pawn_double_black_move[curr_piece] = false;
     } 
   }
 
@@ -465,7 +471,10 @@ vector<string> pawn_valid_move(string &curr_loc,bool white_turn,vector<pair<stri
   string n_pawn = n_pawn_move(move_history,alter_turn,curr_loc);
   debug(n_pawn);
   // n_pawn_move
+  debug(ans);
   if( n_pawn !="null") ans.push_back(n_pawn);
+  debug(ans);
+  
 
   return ans;
 }
@@ -724,10 +733,16 @@ void play(){
         if(loc != "null") white_piece[loc] = "X";
       }
 
-
       // after move setting new location
       if (white_turn){
-        if(choose_piece[0] == 'P' && choose_location[1] == '8'){
+        string n_piece_pawn =  pawn_contains_n_pawn(choose_location);
+        debug("before");
+        debug(n_piece_pawn);
+        if(choose_piece[0] == 'P' && n_piece_pawn != "null") black_piece[n_piece_pawn] = "X";
+        debug(white_piece);
+
+
+        if(choose_piece[0] == 'P' && choose_location[1] == '8'){ // generating new piece by pawn
           white_piece[choose_piece] = "X";
           string new_piece =  pawn_new_piece_opening(white_turn,white_piece);
           white_piece[new_piece] = choose_location;
@@ -735,7 +750,12 @@ void play(){
           white_piece[choose_piece] = choose_location;
         }
       } else {
-        if(choose_piece[0] == 'P' && choose_location[1] == '1'){
+        string n_piece_pawn =  pawn_contains_n_pawn(choose_location);
+        debug("before");
+        debug(n_piece_pawn);
+        if(choose_piece[0] == 'P' && n_piece_pawn != "null") white_piece[n_piece_pawn] = "X";
+
+        if(choose_piece[0] == 'P' && choose_location[1] == '1'){ // generating new piece by pawn
           black_piece[choose_piece] = "X";
           string new_piece =  pawn_new_piece_opening(white_turn,black_piece);
           black_piece[new_piece] = choose_location;
