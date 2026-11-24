@@ -36,6 +36,12 @@ vector<vector<string>> board(8,vector<string>(8));
 class chess{
 
 public:
+  bool white_rook1_move = false;
+  bool white_rook2_move = false;
+
+  bool black_rook1_move = false;
+  bool black_rook2_move = false;
+
   map<string,string>black_piece;
   map<string,string>white_piece;
   vector<pair<string,string>> n_pawn_piece;
@@ -51,7 +57,6 @@ private:
 }
 
 private:
-
 int search_number_of_piece(bool white_turn,map<string,string>& mp,char piece){
   int cnt = 0;
   for(auto i : mp){
@@ -542,6 +547,40 @@ vector<string> king_valid_move(string &curr_loc,bool white_turn){
   files++;
   rank--;
   if( is_valid_move(rank,files) && is_eligiable_loc(rank,files,white_turn)) ans.push_back(files+to_string(rank));
+
+
+  // check for castle move
+  if(white_turn){
+    // left castle case
+    if( white_rook1_move ){
+      rank = row;
+      files = col-1;
+      while(files != 'A'){
+        if(findKey(white_piece,files + to_string(rank)) != "null") break;
+        files--;
+      }
+      if(files == 'A'){ // left castle possible
+        ans.push_back('C'+to_string(rank));
+      }
+    }else if(white_rook2_move){
+      rank = row;
+      files = col+1;
+      while(files != 'H'){
+        if(findKey(white_piece,files + to_string(rank)) != "null") break;
+        files++;
+      }
+
+      if(files == 'H'){ // left castle possible
+        ans.push_back('G'+to_string(rank));
+      }
+    }
+  }else{
+    if(black_rook1_move){
+
+    }else if(black_rook2_move){
+
+    }
+  }
   return ans;
 }
 
@@ -673,6 +712,9 @@ void play(){
     {"P8","H2"}
   };
 
+  bool black_castle = false;
+  bool white_castle = false;
+
   vector<pair<string,string>>move_history;
   bool white_turn = true;
   while(1){
@@ -736,8 +778,6 @@ void play(){
       // after move setting new location
       if (white_turn){
         string n_piece_pawn =  pawn_contains_n_pawn(choose_location);
-        debug("before");
-        debug(n_piece_pawn);
         if(choose_piece[0] == 'P' && n_piece_pawn != "null") black_piece[n_piece_pawn] = "X";
         debug(white_piece);
 
@@ -749,6 +789,24 @@ void play(){
         }else{
           white_piece[choose_piece] = choose_location;
         }
+
+
+
+        // castle move checker
+        if(choose_piece[0] == 'K' ){
+          // left rook castle
+          white_rook1_move = false;
+          white_rook2_move = false;
+        }else if((choose_piece == "R1")){
+          white_rook1_move = false;
+        }else if(choose_piece == "R2"){
+          white_rook2_move = false;
+        }
+
+
+
+
+
       } else {
         string n_piece_pawn =  pawn_contains_n_pawn(choose_location);
         debug("before");
@@ -762,6 +820,21 @@ void play(){
         }else{
           black_piece[choose_piece] = choose_location;
         }
+
+        // castle move checker
+        if(choose_piece[0] == 'K'){
+          // left rook castle
+          black_rook1_move = false;
+          black_rook2_move = false;
+        }else if((choose_piece == "R1")){
+          black_rook1_move = false;
+        }else if(choose_piece == "R2"){
+          black_rook2_move = false;
+        }
+
+
+
+
       }
 
 
