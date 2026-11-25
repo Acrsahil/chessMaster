@@ -30,7 +30,6 @@ template <class T> void _print(unordered_set<T> v) { cerr << "[ "; for (T i : v)
 template <class T> void _print(unordered_multiset<T> v) { cerr << "[ "; for (T i : v) { _print(i); cerr << " "; } cerr << "]"; }
 template <class T, class V> void _print(unordered_map<T, V> v) { cerr << "[ "; for (auto i : v) { _print(i); cerr << " "; } cerr << "]"; }
 
-vector<vector<string>> board(8,vector<string>(8));
 
 
 class chess{
@@ -484,6 +483,40 @@ vector<string> pawn_valid_move(string &curr_loc,bool white_turn,vector<pair<stri
   return ans;
 }
 
+
+bool is_valid_for_castle(bool white_turn){
+  vector<string> search_loc;
+  if(white_turn){
+    if(white_rook1_move){
+      search_loc.push_back("E1");
+      search_loc.push_back("F1");
+      search_loc.push_back("G1");
+    }
+    if(white_rook2_move){
+      search_loc.push_back("E1");
+      search_loc.push_back("D1");
+      search_loc.push_back("C1");
+    }
+  }else{
+    if(black_rook1_move){
+      search_loc.push_back("E8");
+      search_loc.push_back("E8");
+      search_loc.push_back("G8");
+    }
+    if(black_rook2_move){
+      search_loc.push_back("E8");
+      search_loc.push_back("D8");
+      search_loc.push_back("C8");
+    }
+
+
+  }
+
+
+
+  return false;
+}
+
 string castle_move(bool r1,bool r2,bool white_turn,int row,char col){
   map<string,string>piece = white_turn ? white_piece : black_piece;
   if(r1){ // king side
@@ -500,17 +533,17 @@ string castle_move(bool r1,bool r2,bool white_turn,int row,char col){
   }
   if(r2){ // queen side
     debug(r2);
-      int rank = row;
-      char files = col-1;
-      debug(files);
-      while(files != 'A'){
-        if(findKey(piece,files + to_string(rank)) != "null") break;
-        files--;
-      }
-      debug(files);
-      if(files == 'A'){ // left castle possible
-        return ('C'+to_string(rank));
-      }
+    int rank = row;
+    char files = col-1;
+    debug(files);
+    while(files != 'A'){
+      if(findKey(piece,files + to_string(rank)) != "null") break;
+      files--;
+    }
+    debug(files);
+    if(files == 'A'){ // left castle possible
+      return ('C'+to_string(rank));
+    }
   }
   return "null";
 }
@@ -585,10 +618,22 @@ vector<string> king_valid_move(string &curr_loc,bool white_turn){
 
   // check for castle move
   string castle_loc = "";
-  if(white_turn) castle_loc = castle_move(white_rook1_move, white_rook2_move, white_turn,row ,col);
-  else castle_loc = castle_move(black_rook1_move, black_rook2_move, white_turn,row ,col);
-  if(castle_loc != "null") ans.push_back(castle_loc);
+  if(white_turn){
+    castle_loc = castle_move(white_rook1_move, white_rook2_move, white_turn,row ,col);
+    if(castle_loc != "null"){
+      if(is_valid_for_castle(white_turn)){
 
+      }
+    }
+  } else{
+    castle_loc = castle_move(black_rook1_move, black_rook2_move, white_turn,row ,col);
+    if(castle_loc != "null"){
+      if(is_valid_for_castle(white_turn)){
+
+      }
+    } 
+
+  }
   return ans;
 }
 
@@ -786,7 +831,7 @@ void play(){
       if (white_turn){
         string n_piece_pawn =  pawn_contains_n_pawn(choose_location);
         if(choose_piece[0] == 'P' && n_piece_pawn != "null") black_piece[n_piece_pawn] = "X"; // n patient case
-                                                                                              
+
         if(choose_piece[0] == 'P' && choose_location[1] == '8'){ // generating new piece by pawn
           white_piece[choose_piece] = "X";
           string new_piece =  pawn_new_piece_opening(white_turn,white_piece);
@@ -827,7 +872,7 @@ void play(){
             black_piece[choose_piece] = "C8";
             black_piece["R2"] = "D8";
           }else{
-           black_piece[choose_piece] = choose_location;
+            black_piece[choose_piece] = choose_location;
           }
           black_rook1_move = false;
           black_rook2_move = false;
@@ -849,8 +894,6 @@ void play(){
     }else{
       cout << "Sorry illigal move!" << endl;
     }
-
-
   }
 }
 };
