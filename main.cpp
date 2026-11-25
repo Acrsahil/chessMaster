@@ -404,26 +404,35 @@ string pawn_new_piece_opening(bool white_turn,map<string,string> &mp){
 vector<string> pawn_valid_move(string &curr_loc,bool white_turn,vector<pair<string,string>> &move_history){
   // single move
   vector<string> ans;
-    char col  =  curr_loc[0];
+  char col  =  curr_loc[0];
   int row = curr_loc[1]-'0'; // converting to integer
+  bool alter_turn = !white_turn;
 
   if(white_turn){
+
+    // left capture
+    int rank = row+1;
+    char files = col-1;
+    if( is_valid_move(rank,files) && is_eligiable_loc(rank,files,white_turn) && findKey(black_piece,files+to_string(rank)) != "null") ans.push_back(files+to_string(rank));
+
     // single move check
-    int rank = row+1;                    
-    char files = col;
+    rank = row+1;                    
+    files = col;
     if( is_eligiable_loc(rank,files,white_turn) && is_valid_move(rank,files)
         && findKey(white_piece,files+to_string(rank)) == "null" 
         && findKey(black_piece,files+to_string(rank)) == "null") ans.push_back(files+to_string(rank));
 
-    // left capture move check
-    rank = row+1;
-    files = col-1;
-    if( is_valid_move(rank,files) && is_eligiable_loc(rank,files,white_turn) && findKey(black_piece,files+to_string(rank)) != "null") ans.push_back(files+to_string(rank));
+
+    string n_pawn = n_pawn_move(move_history,alter_turn,curr_loc);
+    if( n_pawn !="null") ans.push_back(n_pawn);
 
     // right capture move check
     rank = row+1;
     files = col+1;
     if( is_valid_move(rank,files) && is_eligiable_loc(rank,files,white_turn) && findKey(black_piece,files+to_string(rank)) != "null") ans.push_back(files+to_string(rank));
+
+
+
 
     // double move check
     rank = row+2;
@@ -438,18 +447,25 @@ vector<string> pawn_valid_move(string &curr_loc,bool white_turn,vector<pair<stri
       ){
       ans.push_back(files+to_string(rank));
     } 
-
   }else{
+
+
+    // left capture move check
     int rank = row-1;
-    char files = col;
+    char files = col-1;
+    if( is_valid_move(rank,files) && is_eligiable_loc(rank,files,!white_turn) && findKey(white_piece,files+to_string(rank)) != "null") ans.push_back(files+to_string(rank));
+
+    // n patient case
+    string n_pawn = n_pawn_move(move_history,alter_turn,curr_loc);
+    if( n_pawn !="null") ans.push_back(n_pawn);
+
+    // single move
+    rank = row-1;
+    files = col;
     if( is_valid_move(rank,files) && is_eligiable_loc(rank,files,!white_turn) 
         && findKey(black_piece,files+to_string(rank)) == "null" 
         && findKey(white_piece,files+to_string(rank)) == "null") ans.push_back(files+to_string(rank));
 
-    // left capture move check
-    rank = row-1;
-    files = col-1;
-    if( is_valid_move(rank,files) && is_eligiable_loc(rank,files,!white_turn) && findKey(white_piece,files+to_string(rank)) != "null") ans.push_back(files+to_string(rank));
 
     // right capture move check
     rank = row-1;
@@ -471,50 +487,57 @@ vector<string> pawn_valid_move(string &curr_loc,bool white_turn,vector<pair<stri
     } 
   }
 
-  bool alter_turn = !white_turn;
-  string n_pawn = n_pawn_move(move_history,alter_turn,curr_loc);
-  debug(n_pawn);
-  // n_pawn_move
-  debug(ans);
-  if( n_pawn !="null") ans.push_back(n_pawn);
-  debug(ans);
-  
+
 
   return ans;
 }
 
 
-bool is_valid_for_castle(bool white_turn){
+bool search_in_all_piece(vector<string> &search_loc,bool white_turn){
+  map<string,string> search_des = white_turn ? white_piece : black_piece;
+
+  return true;
+}
+
+bool is_valid_king_side_castle(bool white_turn){
   vector<string> search_loc;
-  if(white_turn){
-    if(white_rook1_move){
-      search_loc.push_back("E1");
-      search_loc.push_back("F1");
-      search_loc.push_back("G1");
-    }
-    if(white_rook2_move){
-      search_loc.push_back("E1");
-      search_loc.push_back("D1");
-      search_loc.push_back("C1");
-    }
-  }else{
-    if(black_rook1_move){
-      search_loc.push_back("E8");
-      search_loc.push_back("E8");
-      search_loc.push_back("G8");
-    }
-    if(black_rook2_move){
-      search_loc.push_back("E8");
-      search_loc.push_back("D8");
-      search_loc.push_back("C8");
-    }
+  bool ans = false;
+  if(white_turn && white_rook2_move){
+    search_loc.push_back("E1");
+    search_loc.push_back("F1");
+    search_loc.push_back("G1");
+
+    ans = search_in_all_piece(search_loc,white_turn);
 
 
+  }else if(!white_turn && black_rook2_move){
+    search_loc.push_back("E8");
+    search_loc.push_back("F8");
+    search_loc.push_back("G8");
+
+    ans = search_in_all_piece(search_loc,white_turn);
+  }
+  return ans;
+}
+
+bool is_valid_queen_side_castle(bool white_turn){
+  vector<string> search_loc;
+  bool ans = false;
+  if(white_turn && white_rook1_move){
+    search_loc.push_back("E1");
+    search_loc.push_back("D1");
+    search_loc.push_back("C1");
+    ans = search_in_all_piece(search_loc,white_turn);
+  }else if(!white_turn  && black_rook1_move){
+    search_loc.push_back("E8");
+    search_loc.push_back("D8");
+    search_loc.push_back("C8");
+    ans = search_in_all_piece(search_loc,white_turn);
   }
 
 
 
-  return false;
+  return ans;
 }
 
 string castle_move(bool r1,bool r2,bool white_turn,int row,char col){
@@ -621,15 +644,19 @@ vector<string> king_valid_move(string &curr_loc,bool white_turn){
   if(white_turn){
     castle_loc = castle_move(white_rook1_move, white_rook2_move, white_turn,row ,col);
     if(castle_loc != "null"){
-      if(is_valid_for_castle(white_turn)){
-
+      if(white_rook2_move && is_valid_king_side_castle(white_turn)){ // right side casteling
+        ans.push_back(castle_loc);
+      } else if( white_rook1_move && is_valid_queen_side_castle(white_turn)) { // left side casteling
+        ans.push_back(castle_loc);
       }
     }
   } else{
     castle_loc = castle_move(black_rook1_move, black_rook2_move, white_turn,row ,col);
     if(castle_loc != "null"){
-      if(is_valid_for_castle(white_turn)){
-
+      if(black_rook2_move && is_valid_king_side_castle(white_turn)){ // right side casteling
+        ans.push_back(castle_loc);
+      } else if( black_rook1_move && is_valid_queen_side_castle(white_turn)){ // left side castaling
+        ans.push_back(castle_loc);
       }
     } 
 
