@@ -44,6 +44,7 @@ public:
   map<string,string>black_piece;
   map<string,string>white_piece;
   vector<pair<string,string>> n_pawn_piece;
+  vector<pair<string,string>>move_history;
 
 private:
   string findKey(map<string, string>& mp, string target) {
@@ -210,6 +211,7 @@ vector<string> rook_valid_move(string &curr_loc, bool white_turn){
       files--;
     }
 
+  sort(ans.begin(),ans.end());
   return ans;
     
 }
@@ -293,6 +295,7 @@ vector<string> bisap_valid_move(string &curr_loc, bool white_turn){
 
 
 
+  sort(ans.begin(),ans.end());
   return ans;
 }
 
@@ -300,6 +303,7 @@ private:
 vector<string> queen_valid_move(string &curr_loc,bool white_turn){
   vector<string> ans = rook_valid_move(curr_loc,white_turn), ans2 = bisap_valid_move(curr_loc,white_turn);
   ans.insert(ans.end(),ans2.begin(),ans2.end());
+  sort(ans.begin(),ans.end());
   return ans;
 }
 
@@ -487,6 +491,7 @@ vector<string> pawn_valid_move(string &curr_loc,bool white_turn,vector<pair<stri
     } 
   }
 
+  sort(ans.begin(),ans.end());
 
 
   return ans;
@@ -495,8 +500,17 @@ vector<string> pawn_valid_move(string &curr_loc,bool white_turn,vector<pair<stri
 
 bool search_in_all_piece(vector<string> &search_loc,bool white_turn){
   map<string,string> search_des = white_turn ? white_piece : black_piece;
+  vector<string> all_piece_move;
+  // search in pawn
+  for(int i = 1; i<=8; i++){
+    vector<string>temp = pawn_valid_move(search_des["P" + to_string(i)], !white_turn, move_history);
+    all_piece_move.insert(all_piece_move.end(), temp.begin(), temp.end());
+  }
 
-  return true;
+  // search in knight
+  for(int i = 1; i<=8; i++){
+  }
+
 }
 
 bool is_valid_king_side_castle(bool white_turn){
@@ -506,9 +520,7 @@ bool is_valid_king_side_castle(bool white_turn){
     search_loc.push_back("E1");
     search_loc.push_back("F1");
     search_loc.push_back("G1");
-
     ans = search_in_all_piece(search_loc,white_turn);
-
 
   }else if(!white_turn && black_rook2_move){
     search_loc.push_back("E8");
@@ -661,6 +673,8 @@ vector<string> king_valid_move(string &curr_loc,bool white_turn){
     } 
 
   }
+
+  sort(ans.begin(),ans.end());
   return ans;
 }
 
@@ -746,6 +760,7 @@ vector<string> knight_valid_move(string &curr_loc,bool white_turn){
     ans.push_back(files + to_string(rank));
   }
 
+  sort(ans.begin(),ans.end());
   return ans;
 }
 
@@ -795,7 +810,6 @@ void play(){
   bool black_castle = false;
   bool white_castle = false;
 
-  vector<pair<string,string>>move_history;
   bool white_turn = true;
   while(1){
     debug(move_history);
@@ -855,7 +869,7 @@ void play(){
       }
 
       // after move setting new location
-      if (white_turn){
+      if (white_turn){ 
         string n_piece_pawn =  pawn_contains_n_pawn(choose_location);
         if(choose_piece[0] == 'P' && n_piece_pawn != "null") black_piece[n_piece_pawn] = "X"; // n patient case
 
