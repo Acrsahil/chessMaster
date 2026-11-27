@@ -213,7 +213,6 @@ vector<string> rook_valid_move(string &curr_loc, bool white_turn){
 
   sort(ans.begin(),ans.end());
   return ans;
-    
 }
 
 private:
@@ -498,7 +497,7 @@ vector<string> pawn_valid_move(string &curr_loc,bool white_turn,vector<pair<stri
 }
 
 
-bool search_in_all_piece(vector<string> &search_loc,bool white_turn){
+bool search_all_piece(vector<string> &search_loc,bool white_turn){
   map<string,string> search_des = white_turn ? white_piece : black_piece;
   vector<string> all_piece_move;
   // search in pawn
@@ -506,6 +505,8 @@ bool search_in_all_piece(vector<string> &search_loc,bool white_turn){
     vector<string>temp = pawn_valid_move(search_des["P" + to_string(i)], !white_turn, move_history);
     all_piece_move.insert(all_piece_move.end(), temp.begin(), temp.end());
   }
+
+
 
   // search in knight
   for(int i = 1; i<=8; i++){
@@ -520,14 +521,14 @@ bool is_valid_king_side_castle(bool white_turn){
     search_loc.push_back("E1");
     search_loc.push_back("F1");
     search_loc.push_back("G1");
-    ans = search_in_all_piece(search_loc,white_turn);
+    ans = search_all_piece(search_loc,white_turn);
 
   }else if(!white_turn && black_rook2_move){
     search_loc.push_back("E8");
     search_loc.push_back("F8");
     search_loc.push_back("G8");
 
-    ans = search_in_all_piece(search_loc,white_turn);
+    ans = search_all_piece(search_loc,white_turn);
   }
   return ans;
 }
@@ -539,12 +540,12 @@ bool is_valid_queen_side_castle(bool white_turn){
     search_loc.push_back("E1");
     search_loc.push_back("D1");
     search_loc.push_back("C1");
-    ans = search_in_all_piece(search_loc,white_turn);
+    ans = search_all_piece(search_loc,white_turn);
   }else if(!white_turn  && black_rook1_move){
     search_loc.push_back("E8");
     search_loc.push_back("D8");
     search_loc.push_back("C8");
-    ans = search_in_all_piece(search_loc,white_turn);
+    ans = search_all_piece(search_loc,white_turn);
   }
 
 
